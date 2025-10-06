@@ -1,5 +1,6 @@
 package com.ndn.JewelryBackend.entity;
 
+import com.ndn.JewelryBackend.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -18,28 +19,32 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User extends BaseEntity implements UserDetails  {
+public class User extends BaseEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không hợp lệ")
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @NotBlank(message = "Password không được để trống")
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     private boolean emailConfirmation;
 
     private String confirmationCode;
 
+    // ---------------- Spring Security ----------------
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_"+role.name()));
+        return role == null ? List.of() : List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -49,29 +54,26 @@ public class User extends BaseEntity implements UserDetails  {
 
     @Override
     public String getPassword() {
-        return password;
+        return this.password;
     }
+
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true; // Luôn active, hoặc custom logic nếu muốn
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return true; // Luôn không khóa, hoặc custom logic nếu muốn
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return true; // Luôn hợp lệ, hoặc custom logic nếu muốn
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
-    }
-
-    public enum Role{
-        USER, ADMIN
+        return this.emailConfirmation; // Chỉ enable khi email đã xác thực
     }
 }
