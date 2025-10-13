@@ -18,5 +18,5 @@ public class ProductResponse {
     private int views;
     private Category category;
     private String collectionName;
-    private List<String> images;
+    private List<ImageResponse> images;
 }

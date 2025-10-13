@@ -16,21 +16,11 @@ public class ImageController {
 
     private final ImageService imageService;
 
-    @PostMapping("/upload/{productId}")
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public ResponseEntity<List<ImageResponse>> uploadImages(
-            @PathVariable Long productId,
-            @RequestParam("files") List<MultipartFile> files) {
-        return ResponseEntity.ok(imageService.uploadImages(productId, files));
+            @RequestPart("files") List<MultipartFile> files) {
+        return ResponseEntity.ok(imageService.uploadImages(files));
     }
 
-    @GetMapping("/product/{productId}")
-    public ResponseEntity<List<ImageResponse>> getImagesByProduct(@PathVariable Long productId) {
-        return ResponseEntity.ok(imageService.getImagesByProduct(productId));
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
-        imageService.deleteImage(id);
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -2,7 +2,6 @@ package com.ndn.JewelryBackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.UUID;
 
 @Entity
 @Table(name = "images")
@@ -13,15 +12,13 @@ import java.util.UUID;
 public class Image extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     private String url;
 
-    @Column(name = "image_embedding", columnDefinition = "vector(512)")
-    private String imageEmbedding;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+//    Nuwa co tu chuyen ve kieu phu hop
+    @Column(name = "image_embedding", columnDefinition = "vector(512)", insertable = false, updatable = false)
+    private Object imageEmbedding;
 }
