@@ -26,6 +26,4 @@ public class GameResult extends BaseEntity {
 
     private int score;
 
-    private boolean voucherSent;
-
 }

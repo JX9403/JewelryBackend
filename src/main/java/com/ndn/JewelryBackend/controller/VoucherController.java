@@ -1,9 +1,15 @@
 package com.ndn.JewelryBackend.controller;
 
+import com.ndn.JewelryBackend.dto.request.SendVoucherRequest;
 import com.ndn.JewelryBackend.dto.request.VoucherRequest;
 import com.ndn.JewelryBackend.dto.response.VoucherResponse;
 import com.ndn.JewelryBackend.service.VoucherService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,18 +40,33 @@ public class VoucherController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/code/{code}")
+    public ResponseEntity<VoucherResponse> getVoucherByCode(@PathVariable String code) {
+        return ResponseEntity.ok(voucherService.getVoucherByCode(code));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<VoucherResponse> getVoucherById(@PathVariable Long id) {
         return ResponseEntity.ok(voucherService.getVoucherById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<VoucherResponse>> getAllVouchers() {
-        return ResponseEntity.ok(voucherService.getAllVouchers());
+    public ResponseEntity<Page<VoucherResponse>> getAllVouchers(
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort
+    ) {
+        // Tách tên cột và hướng sắp xếp
+        String[] parts = sort.split(",");
+        String sortField = parts[0];
+        String sortDir = (parts.length > 1) ? parts[1] : "desc";
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDir);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        return ResponseEntity.ok(voucherService.getAllVouchers(status, pageable));
     }
 
-    @PostMapping("/{id}/send")
-    public ResponseEntity<VoucherResponse> sendVoucher(@PathVariable Long id) {
-        return ResponseEntity.ok(voucherService.sendVoucher(id));
-    }
+
 }

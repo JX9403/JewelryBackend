@@ -20,19 +20,10 @@ public class GameResultController {
         return gameResultService.create(request);
     }
 
-    @PutMapping("/{id}")
-    public GameResultResponse update(@PathVariable Long id, @RequestBody GameResultRequest request) {
-        return gameResultService.update(id, request);
-    }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         gameResultService.delete(id);
-    }
-
-    @GetMapping("/{id}")
-    public GameResultResponse getById(@PathVariable Long id) {
-        return gameResultService.getById(id);
     }
 
     @GetMapping
@@ -40,13 +31,4 @@ public class GameResultController {
         return gameResultService.getAll();
     }
 
-    @GetMapping("/game/{gameId}")
-    public List<GameResultResponse> getByGame(@PathVariable Long gameId) {
-        return gameResultService.getByGame(gameId);
-    }
-
-    @GetMapping("/user/{userId}")
-    public List<GameResultResponse> getByUser(@PathVariable Long userId) {
-        return gameResultService.getByUser(userId);
-    }
 }

@@ -5,6 +5,7 @@ import com.ndn.JewelryBackend.dto.response.GameResultResponse;
 import com.ndn.JewelryBackend.entity.Game;
 import com.ndn.JewelryBackend.entity.GameResult;
 import com.ndn.JewelryBackend.entity.User;
+import com.ndn.JewelryBackend.enums.ActiveStatus;
 import com.ndn.JewelryBackend.repository.GameRepository;
 import com.ndn.JewelryBackend.repository.GameResultRepository;
 import com.ndn.JewelryBackend.repository.UserRepository;
@@ -30,7 +31,6 @@ public class GameResultServiceImpl implements GameResultService {
                 .userId(entity.getUser().getId())
                 .userName(entity.getUser().getUsername())
                 .score(entity.getScore())
-                .voucherSent(entity.isVoucherSent())
                 .build();
     }
 
@@ -45,29 +45,11 @@ public class GameResultServiceImpl implements GameResultService {
                 .game(game)
                 .user(user)
                 .score(request.getScore())
-                .voucherSent(false)
                 .build();
 
         return mapToDto(gameResultRepository.save(result));
     }
 
-    @Override
-    public GameResultResponse update(Long id, GameResultRequest request) {
-        GameResult result = gameResultRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Result not found"));
-
-        if (request.getGameId() != null) {
-            result.setGame(gameRepository.findById(request.getGameId())
-                    .orElseThrow(() -> new RuntimeException("Game not found")));
-        }
-        if (request.getUserId() != null) {
-            result.setUser(userRepository.findById(request.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found")));
-        }
-        result.setScore(request.getScore());
-
-        return mapToDto(gameResultRepository.save(result));
-    }
 
     @Override
     public void delete(Long id) {
@@ -75,27 +57,11 @@ public class GameResultServiceImpl implements GameResultService {
     }
 
     @Override
-    public GameResultResponse getById(Long id) {
-        return gameResultRepository.findById(id)
-                .map(this::mapToDto)
-                .orElseThrow(() -> new RuntimeException("Result not found"));
-    }
-
-    @Override
     public List<GameResultResponse> getAll() {
-        return gameResultRepository.findAll()
-                .stream().map(this::mapToDto).toList();
+        return gameResultRepository.findTop10ByGameStatusOrderByScoreDesc(ActiveStatus.ON)
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
-    @Override
-    public List<GameResultResponse> getByGame(Long gameId) {
-        return gameResultRepository.findByGameId(gameId)
-                .stream().map(this::mapToDto).toList();
-    }
-
-    @Override
-    public List<GameResultResponse> getByUser(Long userId) {
-        return gameResultRepository.findByUserId(userId)
-                .stream().map(this::mapToDto).toList();
-    }
 }

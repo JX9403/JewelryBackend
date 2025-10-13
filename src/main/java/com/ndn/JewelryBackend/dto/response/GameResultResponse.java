@@ -13,5 +13,4 @@ public class GameResultResponse {
     private Long userId;
     private String userName;
     private int score;
-    private boolean voucherSent;
 }

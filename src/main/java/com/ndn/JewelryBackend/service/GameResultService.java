@@ -7,10 +7,6 @@ import java.util.List;
 
 public interface GameResultService {
     GameResultResponse create(GameResultRequest request);
-    GameResultResponse update(Long id, GameResultRequest request);
     void delete(Long id);
-    GameResultResponse getById(Long id);
     List<GameResultResponse> getAll();
-    List<GameResultResponse> getByGame(Long gameId);
-    List<GameResultResponse> getByUser(Long userId);
 }

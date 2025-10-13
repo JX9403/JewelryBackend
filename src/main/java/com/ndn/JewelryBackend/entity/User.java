@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,6 +41,10 @@ public class User extends BaseEntity implements UserDetails {
     private boolean emailConfirmation;
 
     private String confirmationCode;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserVoucher> userVouchers = new ArrayList<>();
+
 
     // ---------------- Spring Security ----------------
     @Override
