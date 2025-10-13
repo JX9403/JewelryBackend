@@ -18,8 +18,8 @@ public class Image extends BaseEntity {
 
     private String url;
 
-    @Column(columnDefinition = "vector")
-    private float[] imgEmbedding;
+    @Column(name = "image_embedding", columnDefinition = "vector(512)")
+    private String imageEmbedding;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)

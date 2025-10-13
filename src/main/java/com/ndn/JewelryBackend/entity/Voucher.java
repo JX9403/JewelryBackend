@@ -4,6 +4,8 @@ import com.ndn.JewelryBackend.enums.VoucherStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "vouchers")
@@ -27,8 +29,8 @@ public class Voucher extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private VoucherStatus status;
 
-    private LocalDateTime sentAt;
+    @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserVoucher> userVouchers = new ArrayList<>();
 
-    private LocalDateTime expiredAt;
 
 }

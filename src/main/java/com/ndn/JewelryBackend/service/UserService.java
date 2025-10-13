@@ -6,6 +6,7 @@ import com.ndn.JewelryBackend.entity.User;
 import com.ndn.JewelryBackend.enums.Role;
 import com.ndn.JewelryBackend.exception.ResourceNotFoundException;
 import com.ndn.JewelryBackend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

@@ -24,4 +24,6 @@ public class Game extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
+
+    private String url;
 }

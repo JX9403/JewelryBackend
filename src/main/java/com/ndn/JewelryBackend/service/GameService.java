@@ -1,6 +1,8 @@
 package com.ndn.JewelryBackend.service;
 
 import com.ndn.JewelryBackend.entity.Game;
+import com.ndn.JewelryBackend.enums.ActiveStatus;
+
 import java.util.List;
 
 public interface GameService {
