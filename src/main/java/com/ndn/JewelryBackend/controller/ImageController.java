@@ -18,8 +18,9 @@ public class ImageController {
 
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public ResponseEntity<List<ImageResponse>> uploadImages(
-            @RequestPart("files") List<MultipartFile> files) {
-        return ResponseEntity.ok(imageService.uploadImages(files));
+            @RequestPart("files") List<MultipartFile> files,
+            @RequestParam("is_raw") boolean isRaw) {
+        return ResponseEntity.ok(imageService.uploadImages(files, isRaw));
     }
 
 
