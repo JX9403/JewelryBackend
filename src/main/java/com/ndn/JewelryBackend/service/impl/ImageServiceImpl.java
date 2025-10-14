@@ -32,7 +32,7 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
 
     @Override
-    public List<ImageResponse> uploadImages(List<MultipartFile> files) {
+    public List<ImageResponse> uploadImages(List<MultipartFile> files, boolean isRaw) {
         List<ImageResponse> responses = new ArrayList<>();
 
         for (MultipartFile file : files) {
@@ -49,6 +49,7 @@ public class ImageServiceImpl implements ImageService {
                     String publicUrl = supabaseUrl + "/storage/v1/object/public/" + bucket + "/" + fileName;
                     // ✅ Lưu vào DB
                     Image image = Image.builder()
+                            .isRaw(isRaw)
                             .url(publicUrl)
                             .build();
 
