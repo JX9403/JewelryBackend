@@ -17,9 +17,11 @@ public class ImageController {
     private final ImageService imageService;
 
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public ResponseEntity<List<ImageResponse>> uploadImages(
-            @RequestPart("files") List<MultipartFile> files) {
-        return ResponseEntity.ok(imageService.uploadImages(files));
+    public ResponseEntity<ImageResponse> uploadImage(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam("isUsedForAI") Boolean isUsedForAI
+    ) {
+        return ResponseEntity.ok(imageService.uploadImage(file, isUsedForAI));
     }
 
 

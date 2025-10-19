@@ -1,13 +1,18 @@
 package com.ndn.JewelryBackend.controller;
 
+import com.ndn.JewelryBackend.dto.response.CollectionResponse;
+import com.ndn.JewelryBackend.dto.response.GameResponse;
 import com.ndn.JewelryBackend.entity.Game;
-import com.ndn.JewelryBackend.enums.ActiveStatus;
 import com.ndn.JewelryBackend.service.GameService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -18,9 +23,23 @@ public class GameController {
     private final GameService gameService;
 
     @GetMapping
-    public ResponseEntity<List<Game>> getAllGames() {
-        List<Game> games = gameService.getAll();
-        return ResponseEntity.ok(games);
+    public ResponseEntity<Page<GameResponse>> getAllGames(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort
+    ) {
+        String[] parts = sort.split(",");
+        String sortField = parts[0];
+        String sortDir = (parts.length > 1) ? parts[1] : "desc";
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDir);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        Page<GameResponse> result =
+                gameService.getAll(name, pageable);
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
@@ -31,9 +50,10 @@ public class GameController {
 
     @PostMapping
     public ResponseEntity<Game> createGame(@RequestBody Game game) {
-        game.setId(null);
         Game created = gameService.create(game);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity
+                .created(URI.create("/api/games/" + created.getId()))
+                .body(created);
     }
 
     @PutMapping("/{id}")
@@ -47,5 +67,4 @@ public class GameController {
         gameService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

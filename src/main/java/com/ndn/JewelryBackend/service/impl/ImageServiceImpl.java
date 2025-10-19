@@ -32,43 +32,39 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
 
     @Override
-    public List<ImageResponse> uploadImages(List<MultipartFile> files) {
-        List<ImageResponse> responses = new ArrayList<>();
+    public ImageResponse uploadImage(MultipartFile file, Boolean isUsedForAI) {
+        try {
+            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
-        for (MultipartFile file : files) {
-            try {
-                String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            HttpResponse<String> res = Unirest.post(supabaseUrl + "/storage/v1/object/" + bucket + "/" + fileName)
+                    .header("Authorization", "Bearer " + supabaseKey)
+                    .header("Content-Type", file.getContentType())
+                    .body(file.getBytes())
+                    .asString();
 
-                HttpResponse<String> res = Unirest.post(supabaseUrl + "/storage/v1/object/" + bucket + "/" + fileName)
-                        .header("Authorization", "Bearer " + supabaseKey)
-                        .header("Content-Type", file.getContentType())
-                        .body(file.getBytes())
-                        .asString();
+            if (res.getStatus() == 200 || res.getStatus() == 201) {
+                String publicUrl = supabaseUrl + "/storage/v1/object/public/" + bucket + "/" + fileName;
 
-                if (res.getStatus() == 200 || res.getStatus() == 201) {
-                    String publicUrl = supabaseUrl + "/storage/v1/object/public/" + bucket + "/" + fileName;
-                    // ✅ Lưu vào DB
-                    Image image = Image.builder()
-                            .url(publicUrl)
-                            .build();
+                Image image = Image.builder()
+                        .url(publicUrl)
+                        .isUsedForAI(isUsedForAI)
+                        .build();
 
-                    Image saved = imageRepository.save(image);
+                Image saved = imageRepository.save(image);
 
-                    responses.add(ImageResponse.builder()
-                            .id(saved.getId())
-                            .url(saved.getUrl())
-                            .build());
-
-                } else {
-                    throw new RuntimeException("Upload failed: " + res.getBody());
-                }
-
-            } catch (IOException e) {
-                throw new RuntimeException("Error reading file", e);
+                return ImageResponse.builder()
+                        .id(saved.getId())
+                        .url(saved.getUrl())
+                        .isUsedForAI(saved.getIsUsedForAI())
+                        .build();
+            } else {
+                throw new RuntimeException("Upload failed: " + res.getBody());
             }
-        }
 
-        return responses;
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading file", e);
+        }
     }
+
 
 }

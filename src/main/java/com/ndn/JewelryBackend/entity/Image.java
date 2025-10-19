@@ -15,10 +15,10 @@ public class Image extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     private String url;
 
-//    Nuwa co tu chuyen ve kieu phu hop
+    private Boolean isUsedForAI;
+
     @Column(name = "image_embedding", columnDefinition = "vector(512)", insertable = false, updatable = false)
     private Object imageEmbedding;
 }
