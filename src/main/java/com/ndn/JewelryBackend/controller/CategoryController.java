@@ -1,9 +1,8 @@
 package com.ndn.JewelryBackend.controller;
 
-import com.ndn.JewelryBackend.dto.request.CollectionRequest;
-import com.ndn.JewelryBackend.dto.response.CollectionResponse;
-import com.ndn.JewelryBackend.dto.response.UserVoucherResponse;
-import com.ndn.JewelryBackend.service.CollectionService;
+import com.ndn.JewelryBackend.dto.request.CategoryRequest;
+import com.ndn.JewelryBackend.dto.response.CategoryResponse;
+import com.ndn.JewelryBackend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,39 +12,37 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/collections")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
-public class CollectionController {
+public class CategoryController {
 
-    private final CollectionService collectionService;
+    private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CollectionResponse> create(@RequestBody CollectionRequest request) {
-        CollectionResponse response = collectionService.create(request);
+    public ResponseEntity<CategoryResponse> create(@RequestBody CategoryRequest request) {
+        CategoryResponse response = categoryService.create(request);
         return ResponseEntity
-                .created(URI.create("/api/collections/" + response.getId()))
+                .created(URI.create("/api/categories/" + response.getId()))
                 .body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CollectionResponse> update(@PathVariable Long id,
-                                                     @RequestBody CollectionRequest request) {
-        CollectionResponse response = collectionService.update(id, request);
+    public ResponseEntity<CategoryResponse> update(@PathVariable Long id,
+                                                     @RequestBody CategoryRequest request) {
+        CategoryResponse response = categoryService.update(id, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        collectionService.delete(id);
+        categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<Page<CollectionResponse>> getAll(
+    public ResponseEntity<Page<CategoryResponse>> getAll(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -59,15 +56,15 @@ public class CollectionController {
         Sort.Direction direction = Sort.Direction.fromString(sortDir);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
 
-        Page<CollectionResponse> result =
-                collectionService.getAll(name, pageable);
+        Page<CategoryResponse> result =
+                categoryService.getAll(name, pageable);
 
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CollectionResponse> getById(@PathVariable Long id) {
-        CollectionResponse response = collectionService.getById(id);
+    public ResponseEntity<CategoryResponse> getById(@PathVariable Long id) {
+        CategoryResponse response = categoryService.getById(id);
         return ResponseEntity.ok(response);
     }
 }

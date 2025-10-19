@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,7 +25,10 @@ public class UserVoucherController {
     public ResponseEntity<UserVoucherResponse> sendVoucher(
             @RequestParam Long voucherId,
             @RequestParam Long userId) {
-        return ResponseEntity.ok(userVoucherService.sendVoucherToUser(voucherId, userId));
+        UserVoucherResponse response = userVoucherService.sendVoucherToUser(voucherId, userId);
+        return ResponseEntity
+                .created(URI.create("/api/user-vouchers/" + response.getId()))
+                .body(response);
     }
 
     @GetMapping("/user")
@@ -32,9 +36,9 @@ public class UserVoucherController {
             @RequestParam Long userId,
             @RequestParam(required = false) UserVoucherStatus status
     ) {
-        return ResponseEntity.ok(userVoucherService.getVouchersByUser(userId, status));
+        List<UserVoucherResponse> responses = userVoucherService.getVouchersByUser(userId, status);
+        return ResponseEntity.ok(responses);
     }
-
 
     @PutMapping("/{userVoucherId}/use")
     public ResponseEntity<Void> markAsUsed(@PathVariable Long userVoucherId) {
@@ -51,7 +55,6 @@ public class UserVoucherController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "sentAt,desc") String sort
     ) {
-        // Tách tên cột và hướng sắp xếp
         String[] parts = sort.split(",");
         String sortField = parts[0];
         String sortDir = (parts.length > 1) ? parts[1] : "desc";
@@ -59,8 +62,9 @@ public class UserVoucherController {
         Sort.Direction direction = Sort.Direction.fromString(sortDir);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
 
-        Page<UserVoucherResponse> result = userVoucherService.getAllUserVouchers(userId, voucherId, status, pageable);
+        Page<UserVoucherResponse> result =
+                userVoucherService.getAllUserVouchers(userId, voucherId, status, pageable);
+
         return ResponseEntity.ok(result);
     }
-
 }

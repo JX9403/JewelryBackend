@@ -1,6 +1,5 @@
 package com.ndn.JewelryBackend.entity;
 
-import com.ndn.JewelryBackend.enums.Category;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -32,7 +31,8 @@ public class Product extends BaseEntity {
 
     private int views;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @ManyToOne

@@ -1,7 +1,6 @@
 package com.ndn.JewelryBackend.dto.request;
 
 import com.ndn.JewelryBackend.dto.response.ImageResponse;
-import com.ndn.JewelryBackend.enums.Category;
 import lombok.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,7 +15,7 @@ public class ProductRequest {
     private String description;
     private BigDecimal price;
     private String gender;
-    private Category category;
+    private Long categoryId;
     private Long collectionId;
     private List<ImageResponse> images;
 }

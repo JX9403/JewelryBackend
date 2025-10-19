@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ImageResponse {
+public class CategoryResponse {
     private Long id;
-    private String url;
-    private Boolean isUsedForAI;
+    private String name;
+    private String description;
 }

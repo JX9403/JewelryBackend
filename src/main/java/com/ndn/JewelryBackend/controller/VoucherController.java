@@ -9,11 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/vouchers")
@@ -24,14 +23,19 @@ public class VoucherController {
 
     @PostMapping
     public ResponseEntity<VoucherResponse> createVoucher(@RequestBody VoucherRequest request) {
-        return ResponseEntity.ok(voucherService.createVoucher(request));
+        VoucherResponse response = voucherService.createVoucher(request);
+        // Trả về 201 Created và header Location
+        return ResponseEntity
+                .created(URI.create("/api/vouchers/" + response.getId()))
+                .body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VoucherResponse> updateVoucher(
             @PathVariable Long id,
             @RequestBody VoucherRequest request) {
-        return ResponseEntity.ok(voucherService.updateVoucher(id, request));
+        VoucherResponse response = voucherService.updateVoucher(id, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
@@ -42,12 +46,14 @@ public class VoucherController {
 
     @GetMapping("/code/{code}")
     public ResponseEntity<VoucherResponse> getVoucherByCode(@PathVariable String code) {
-        return ResponseEntity.ok(voucherService.getVoucherByCode(code));
+        VoucherResponse response = voucherService.getVoucherByCode(code);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<VoucherResponse> getVoucherById(@PathVariable Long id) {
-        return ResponseEntity.ok(voucherService.getVoucherById(id));
+        VoucherResponse response = voucherService.getVoucherById(id);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
@@ -57,7 +63,6 @@ public class VoucherController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort
     ) {
-        // Tách tên cột và hướng sắp xếp
         String[] parts = sort.split(",");
         String sortField = parts[0];
         String sortDir = (parts.length > 1) ? parts[1] : "desc";
@@ -65,8 +70,7 @@ public class VoucherController {
         Sort.Direction direction = Sort.Direction.fromString(sortDir);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
 
-        return ResponseEntity.ok(voucherService.getAllVouchers(status, pageable));
+        Page<VoucherResponse> response = voucherService.getAllVouchers(status, pageable);
+        return ResponseEntity.ok(response);
     }
-
-
 }
