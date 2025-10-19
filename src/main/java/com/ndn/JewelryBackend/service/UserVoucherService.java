@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserVoucherService {
     UserVoucherResponse sendVoucherToUser(Long voucherId, Long userId);
-    List<UserVoucherResponse> getVouchersByUser(Long userId, UserVoucherStatus status);
+    Page<UserVoucherResponse> getVouchersByUser(Long userId, UserVoucherStatus status, Pageable pageable);
     void markAsUsed(Long userVoucherId);
-    Page<UserVoucherResponse> getAllUserVouchers(Long userId, Long voucherId, String status, Pageable pageable);
+    Page<UserVoucherResponse> getAllUserVouchers(Long userId, Long voucherId, UserVoucherStatus status, Pageable pageable);
 }

@@ -32,12 +32,24 @@ public class UserVoucherController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<UserVoucherResponse>> getByUserAndStatus(
+    public ResponseEntity<Page<UserVoucherResponse>> getByUserAndStatus(
             @RequestParam Long userId,
-            @RequestParam(required = false) UserVoucherStatus status
+            @RequestParam(required = false) UserVoucherStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "sentAt,desc") String sort
     ) {
-        List<UserVoucherResponse> responses = userVoucherService.getVouchersByUser(userId, status);
-        return ResponseEntity.ok(responses);
+        String[] parts = sort.split(",");
+        String sortField = parts[0];
+        String sortDir = (parts.length > 1) ? parts[1] : "desc";
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDir);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        Page<UserVoucherResponse> result =
+                userVoucherService.getVouchersByUser(userId, status, pageable);
+
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{userVoucherId}/use")
@@ -50,7 +62,7 @@ public class UserVoucherController {
     public ResponseEntity<Page<UserVoucherResponse>> getAllUserVouchers(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long voucherId,
-            @RequestParam(required = false) String status,
+            @RequestParam(required = false) UserVoucherStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "sentAt,desc") String sort
