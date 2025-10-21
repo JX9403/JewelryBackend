@@ -21,7 +21,7 @@ public class EmailService {
         message.setFrom(fromEmail);
         message.setTo(user.getEmail());
         message.setSubject("Confirm your email");
-        message.setText("Please confirm your email by entering this code " + user.getConfirmationCode());
+//        message.setText("Please confirm your email by entering this code " + user.getConfirmationCode());
 
         mailSender.send(message);
     }

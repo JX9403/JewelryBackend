@@ -31,16 +31,15 @@ public class User extends BaseEntity implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
+    private String firstname;
+    private String secondname;
+
     @NotBlank(message = "Password không được để trống")
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
-    private boolean emailConfirmation;
-
-    private String confirmationCode;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserVoucher> userVouchers = new ArrayList<>();
@@ -49,7 +48,7 @@ public class User extends BaseEntity implements UserDetails {
     // ---------------- Spring Security ----------------
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role == null ? List.of() : List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return role == null ? List.of() : List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
@@ -64,21 +63,21 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Luôn active, hoặc custom logic nếu muốn
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Luôn không khóa, hoặc custom logic nếu muốn
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Luôn hợp lệ, hoặc custom logic nếu muốn
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.emailConfirmation; // Chỉ enable khi email đã xác thực
+        return true;
     }
 }
