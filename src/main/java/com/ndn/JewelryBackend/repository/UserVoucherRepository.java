@@ -21,9 +21,10 @@ public interface UserVoucherRepository extends JpaRepository<UserVoucher, Long> 
           AND (:status IS NULL OR uv.status = :status)
         ORDER BY uv.sentAt DESC
     """)
-    List<UserVoucher> findByUserIdAndOptionalStatus(
+    Page<UserVoucher> findByUserIdAndOptionalStatus(
             @Param("userId") Long userId,
-            @Param("status") UserVoucherStatus status
+            @Param("status") UserVoucherStatus status,
+            Pageable pageable
     );
 
     @Query("""

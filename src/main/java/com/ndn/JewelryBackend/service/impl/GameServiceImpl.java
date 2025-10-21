@@ -1,11 +1,16 @@
 package com.ndn.JewelryBackend.service.impl;
 
+import com.ndn.JewelryBackend.dto.response.CollectionResponse;
+import com.ndn.JewelryBackend.dto.response.GameResponse;
+import com.ndn.JewelryBackend.entity.Collection;
 import com.ndn.JewelryBackend.entity.Game;
 import com.ndn.JewelryBackend.enums.ActiveStatus;
 import com.ndn.JewelryBackend.exception.ResourceNotFoundException;
 import com.ndn.JewelryBackend.repository.GameRepository;
 import com.ndn.JewelryBackend.service.GameService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +55,15 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> getAll() {
-        return gameRepository.findAll();
+    public Page<GameResponse> getAll(String name, Pageable pageable) {
+        Page<Game> page = gameRepository.findAll(name, pageable);
+        return page.map(this::toResponse);
+    }
+
+    private GameResponse toResponse(Game game) {
+        return GameResponse.builder()
+                .id(game.getId())
+                .name(game.getName())
+                .build();
     }
 }

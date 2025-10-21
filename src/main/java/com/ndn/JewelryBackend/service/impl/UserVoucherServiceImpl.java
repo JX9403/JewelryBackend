@@ -60,16 +60,14 @@ public class UserVoucherServiceImpl implements UserVoucherService {
     }
 
     @Override
-    public List<UserVoucherResponse> getVouchersByUser(Long userId, UserVoucherStatus status) {
-        return userVoucherRepository.findByUserIdAndOptionalStatus(userId, status)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<UserVoucherResponse> getVouchersByUser(Long userId, UserVoucherStatus status, Pageable pageable) {
+        Page<UserVoucher> page = userVoucherRepository.findByUserIdAndOptionalStatus(userId, status, pageable);
+        return page.map(this::toResponse);
     }
 
 
     @Override
-    public Page<UserVoucherResponse> getAllUserVouchers(Long userId, Long voucherId, String status, Pageable pageable) {
+    public Page<UserVoucherResponse> getAllUserVouchers(Long userId, Long voucherId, UserVoucherStatus status, Pageable pageable) {
         UserVoucherStatus statusEnum = null;
 
         if (userId != null && !userRepository.existsById(userId)) {
@@ -78,14 +76,7 @@ public class UserVoucherServiceImpl implements UserVoucherService {
         if (voucherId != null && !voucherRepository.existsById(voucherId)) {
             throw new ResourceNotFoundException("Voucher not found");
         }
-        if (status != null && !status.isEmpty()) {
-            try {
-                statusEnum = UserVoucherStatus.valueOf(status.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Status not found ");
-            }
-        }
-        Page<UserVoucher> page = userVoucherRepository.searchUserVouchers(userId, voucherId, statusEnum, pageable);
+        Page<UserVoucher> page = userVoucherRepository.searchUserVouchers(userId, voucherId, status, pageable);
 
         return page.map(this::toResponse);
     }

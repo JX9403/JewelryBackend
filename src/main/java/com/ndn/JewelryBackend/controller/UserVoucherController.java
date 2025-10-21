@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,17 +25,32 @@ public class UserVoucherController {
     public ResponseEntity<UserVoucherResponse> sendVoucher(
             @RequestParam Long voucherId,
             @RequestParam Long userId) {
-        return ResponseEntity.ok(userVoucherService.sendVoucherToUser(voucherId, userId));
+        UserVoucherResponse response = userVoucherService.sendVoucherToUser(voucherId, userId);
+        return ResponseEntity
+                .created(URI.create("/api/user-vouchers/" + response.getId()))
+                .body(response);
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<UserVoucherResponse>> getByUserAndStatus(
+    public ResponseEntity<Page<UserVoucherResponse>> getByUserAndStatus(
             @RequestParam Long userId,
-            @RequestParam(required = false) UserVoucherStatus status
+            @RequestParam(required = false) UserVoucherStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "sentAt,desc") String sort
     ) {
-        return ResponseEntity.ok(userVoucherService.getVouchersByUser(userId, status));
-    }
+        String[] parts = sort.split(",");
+        String sortField = parts[0];
+        String sortDir = (parts.length > 1) ? parts[1] : "desc";
 
+        Sort.Direction direction = Sort.Direction.fromString(sortDir);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        Page<UserVoucherResponse> result =
+                userVoucherService.getVouchersByUser(userId, status, pageable);
+
+        return ResponseEntity.ok(result);
+    }
 
     @PutMapping("/{userVoucherId}/use")
     public ResponseEntity<Void> markAsUsed(@PathVariable Long userVoucherId) {
@@ -46,12 +62,11 @@ public class UserVoucherController {
     public ResponseEntity<Page<UserVoucherResponse>> getAllUserVouchers(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long voucherId,
-            @RequestParam(required = false) String status,
+            @RequestParam(required = false) UserVoucherStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "sentAt,desc") String sort
     ) {
-        // Tách tên cột và hướng sắp xếp
         String[] parts = sort.split(",");
         String sortField = parts[0];
         String sortDir = (parts.length > 1) ? parts[1] : "desc";
@@ -59,8 +74,9 @@ public class UserVoucherController {
         Sort.Direction direction = Sort.Direction.fromString(sortDir);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
 
-        Page<UserVoucherResponse> result = userVoucherService.getAllUserVouchers(userId, voucherId, status, pageable);
+        Page<UserVoucherResponse> result =
+                userVoucherService.getAllUserVouchers(userId, voucherId, status, pageable);
+
         return ResponseEntity.ok(result);
     }
-
 }
