@@ -2,7 +2,10 @@ package com.ndn.JewelryBackend.service;
 
 import com.ndn.JewelryBackend.dto.request.ProductRequest;
 import com.ndn.JewelryBackend.dto.response.ProductResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductService {
@@ -13,9 +16,11 @@ public interface ProductService {
 
     void delete(Long id);
 
-    List<ProductResponse> getAll();
+    Page<ProductResponse> getAll(String name, Long categoryId, Long collectionId, BigDecimal priceTo, BigDecimal priceFrom, String gender, Pageable pageable);
 
     ProductResponse getById(Long id);
 
     List<ProductResponse> getProductsByCollection(Long collectionId);
+
+    List<ProductResponse> getProductsByCategory(Long categoryId);
 }

@@ -17,10 +17,8 @@ public class Image extends BaseEntity {
 
     private String url;
 
-    @Column(name = "is_raw")
-    private boolean isRaw = false;
+    private Boolean isUsedForAI;
 
-//    Nuwa co tu chuyen ve kieu phu hop
     @Column(name = "image_embedding", columnDefinition = "vector(512)", insertable = false, updatable = false)
     private String imageEmbedding;
 }
