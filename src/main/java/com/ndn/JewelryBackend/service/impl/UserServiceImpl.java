@@ -1,4 +1,4 @@
-package com.ndn.JewelryBackend.service;
+package com.ndn.JewelryBackend.service.impl;
 
 import com.ndn.JewelryBackend.dto.request.ChangePasswordRequest;
 import com.ndn.JewelryBackend.dto.request.RegisterRequest;
@@ -6,6 +6,8 @@ import com.ndn.JewelryBackend.entity.User;
 import com.ndn.JewelryBackend.enums.Role;
 import com.ndn.JewelryBackend.exception.ResourceNotFoundException;
 import com.ndn.JewelryBackend.repository.UserRepository;
+import com.ndn.JewelryBackend.service.EmailService;
+import com.ndn.JewelryBackend.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
