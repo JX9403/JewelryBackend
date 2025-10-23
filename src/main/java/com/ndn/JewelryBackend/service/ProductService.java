@@ -2,8 +2,10 @@ package com.ndn.JewelryBackend.service;
 
 import com.ndn.JewelryBackend.dto.request.ProductRequest;
 import com.ndn.JewelryBackend.dto.response.ProductResponse;
+import com.ndn.JewelryBackend.exception.InsufficientStockException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,4 +25,6 @@ public interface ProductService {
     List<ProductResponse> getProductsByCollection(Long collectionId);
 
     List<ProductResponse> getProductsByCategory(Long categoryId);
+
+    Page<ProductResponse> visualSearch(Long categoryID , MultipartFile file, Pageable pageable) throws InsufficientStockException;
 }

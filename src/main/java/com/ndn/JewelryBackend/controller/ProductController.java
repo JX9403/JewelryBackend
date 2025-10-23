@@ -9,8 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -72,5 +74,16 @@ public class ProductController {
     public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
         ProductResponse response = productService.getById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/visual_search", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Page<ProductResponse>>  visualSearch(
+            @RequestParam MultipartFile file,
+            @RequestParam Long categoriesId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+            ) {
+        Page<ProductResponse> responses = productService.visualSearch(categoriesId, file, PageRequest.of(page, size));
+        return ResponseEntity.ok(responses);
     }
 }

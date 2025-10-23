@@ -23,4 +23,6 @@ public class Category extends BaseEntity {
 
     @Lob
     private String description;
+
+
 }
