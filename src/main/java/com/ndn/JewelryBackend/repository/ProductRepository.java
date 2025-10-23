@@ -1,5 +1,6 @@
 package com.ndn.JewelryBackend.repository;
 
+import com.ndn.JewelryBackend.dto.response.ProductSimilarityProjection;
 import com.ndn.JewelryBackend.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +35,51 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 
+    @Query(
+            value = """
+            WITH ProductDistances AS (
+                SELECT
+                    p.id AS product_id,
+                    MIN(i.image_embedding <=> CAST(:vec AS vector)) AS min_distance
+                FROM
+                    products p
+                JOIN
+                    images i ON p.id = i.product_id
+                WHERE
+                    i.is_used_for_ai = true
+                GROUP BY
+                    p.id
+            )
+            SELECT
+                p.id AS id,
+                pd.min_distance AS minDistance
+            FROM products p
+            JOIN ProductDistances pd ON p.id = pd.product_id
+            WHERE p.category_id = :category_id
+            ORDER BY
+                pd.min_distance ASC
+        """,
+            countQuery = """
+            SELECT COUNT(DISTINCT p.id)
+            FROM products p
+            JOIN images i ON p.id = i.product_id
+            WHERE i.is_used_for_ai = true
+        """,
+            nativeQuery = true
+    )
+    Page<ProductSimilarityProjection> findSimilarProductIds(
+            @Param("category_id") Long categoryID,
+            @Param("vec") String vec,
+            Pageable pageable
+    );
+
+    @Query(
+            value = """
+            SELECT DISTINCT p
+            FROM Product p
+            LEFT JOIN FETCH p.images
+            WHERE p.id IN :ids
+        """
+    )
+    List<Product> findProductsWithImagesByIds(@Param("ids") List<Long> ids);
 }
