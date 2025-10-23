@@ -17,6 +17,7 @@ public class Image extends BaseEntity {
 
     private String url;
 
+    @Column(name="is_used_for_ai")
     private Boolean isUsedForAI;
 
     @Column(name = "image_embedding", columnDefinition = "vector(512)", insertable = false, updatable = false)
