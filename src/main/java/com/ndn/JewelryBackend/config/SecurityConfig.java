@@ -2,6 +2,7 @@ package com.ndn.JewelryBackend.config;
 
 import com.ndn.JewelryBackend.repository.UserRepository;
 import com.ndn.JewelryBackend.service.JwtService;
+import com.ndn.JewelryBackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +14,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,62 +26,45 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtService jwtService;
-    private final ApiPermissionConfig apiPermissionConfig; // ✨ Inject file mới
+    private final ApiPermissionConfig apiPermissionConfig;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService, userService);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,PasswordEncoder passwordEncoder) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // permit all chung
                         .requestMatchers(apiPermissionConfig.getPermitAllPatterns()).permitAll()
-
-                        // permit all theo method
                         .requestMatchers(HttpMethod.GET, apiPermissionConfig.getPermitAllGet()).permitAll()
                         .requestMatchers(HttpMethod.POST, apiPermissionConfig.getPermitAllPost()).permitAll()
                         .requestMatchers(HttpMethod.PUT, apiPermissionConfig.getPermitAllPut()).permitAll()
                         .requestMatchers(HttpMethod.DELETE, apiPermissionConfig.getPermitAllDelete()).permitAll()
-
-                        // các endpoint yêu cầu xác thực
                         .requestMatchers("/api/auth/change-password").authenticated()
-//                        .anyRequest().authenticated()
                         .anyRequest().permitAll()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider(passwordEncoder))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtService, userDetailsService());
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public DaoAuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userService.userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> (UserDetails) userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
     }
 }
