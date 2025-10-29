@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -30,7 +32,7 @@ public class Product extends BaseEntity {
     private int views;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = " ")
     private Category category;
 
     @ManyToOne
@@ -41,4 +43,11 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "product_id")
     private List<Image> images = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "product_label",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "label_id")
+    )
+    private Set<Label> labelSet = new HashSet<>();
 }

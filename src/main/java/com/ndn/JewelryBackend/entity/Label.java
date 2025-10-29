@@ -2,28 +2,22 @@ package com.ndn.JewelryBackend.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "categories")
+@Table(name="labels")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category extends BaseEntity {
-
+public class Label {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
-    @Column(unique = true, nullable = false)
-    private String name;
+    String type;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    String value;
 
-
+    String name;
 }
