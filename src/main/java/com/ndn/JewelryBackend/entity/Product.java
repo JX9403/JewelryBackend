@@ -42,12 +42,4 @@ public class Product extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "product_id")
     private List<Image> images = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
-            name = "product_label",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "label_id")
-    )
-    private Set<Label> labelSet = new HashSet<>();
 }
