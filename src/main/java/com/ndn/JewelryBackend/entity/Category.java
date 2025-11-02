@@ -21,7 +21,6 @@ public class Category extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String description;
 
