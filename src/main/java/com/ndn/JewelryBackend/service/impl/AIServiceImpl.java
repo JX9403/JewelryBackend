@@ -67,4 +67,28 @@ public class AIServiceImpl implements AIService {
             throw new InsufficientStockException("Error calling FastAPI: " + e);
         }
     }
+
+    @Override
+    public String AnalyzeAllImg() throws InsufficientStockException {
+        try {
+            String url = urlDevAi + "/analyze_all_img";
+
+            HttpClient client = HttpClient.newHttpClient();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "multipart/form-data; boundary=---JavaBoundary")
+                    .PUT(HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return response.body();
+            } else {
+                throw new InsufficientStockException("FastAPI error: " + response.body());
+            }
+        } catch (Exception e) {
+            throw new InsufficientStockException("Error calling FastAPI: " + e);
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.ndn.JewelryBackend.service.impl;
 import com.ndn.JewelryBackend.dto.response.ImageResponse;
 import com.ndn.JewelryBackend.entity.Image;
 import com.ndn.JewelryBackend.repository.ImageRepository;
+import com.ndn.JewelryBackend.service.AIService;
 import com.ndn.JewelryBackend.service.ImageService;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
@@ -30,6 +31,7 @@ public class ImageServiceImpl implements ImageService {
     private String bucket;
 
     private final ImageRepository imageRepository;
+    private final AIService aiService;
 
     @Override
     public ImageResponse uploadImage(MultipartFile file, Boolean isUsedForAI) {
@@ -64,6 +66,11 @@ public class ImageServiceImpl implements ImageService {
         } catch (IOException e) {
             throw new RuntimeException("Error reading file", e);
         }
+    }
+
+    @Override
+    public String embeddingAllProductImg() {
+        return aiService.AnalyzeAllImg();
     }
 
 

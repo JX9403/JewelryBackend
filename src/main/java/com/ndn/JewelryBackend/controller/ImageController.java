@@ -24,5 +24,8 @@ public class ImageController {
         return ResponseEntity.ok(imageService.uploadImage(file, isUsedForAI));
     }
 
-
+    @PutMapping("/embedding_all_product_img")
+    public ResponseEntity<String> EmbeddingAllProductImg() {
+        return ResponseEntity.ok(imageService.embeddingAllProductImg());
+    }
 }
