@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ImageService {
     ImageResponse uploadImage(MultipartFile file, Boolean isUsedForAI);
+
+    String embeddingAllProductImg();
 }

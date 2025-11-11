@@ -33,5 +33,8 @@ public class ImageController {
         return ResponseEntity.ok(apiResponse);
     }
 
-
+    @PutMapping("/embedding_all_product_img")
+    public ResponseEntity<String> EmbeddingAllProductImg() {
+        return ResponseEntity.ok(imageService.embeddingAllProductImg());
+    }
 }
