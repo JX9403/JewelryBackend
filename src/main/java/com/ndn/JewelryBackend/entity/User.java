@@ -41,10 +41,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserVoucher> userVouchers = new ArrayList<>();
-
-
     // ---------------- Spring Security ----------------
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

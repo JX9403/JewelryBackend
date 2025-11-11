@@ -1,6 +1,7 @@
 package com.ndn.JewelryBackend.controller;
 
 import com.ndn.JewelryBackend.dto.request.CategoryRequest;
+import com.ndn.JewelryBackend.dto.response.ApiResponse;
 import com.ndn.JewelryBackend.dto.response.CategoryResponse;
 import com.ndn.JewelryBackend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -21,28 +22,45 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> create(@RequestBody CategoryRequest request) {
-        CategoryResponse response = categoryService.create(request);
-        return ResponseEntity
-                .created(URI.create("/api/categories/" + response.getId()))
-                .body(response);
+    public ResponseEntity<ApiResponse> create(@RequestBody CategoryRequest request) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data( categoryService.create(request))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> update(@PathVariable Long id,
+    public ResponseEntity<ApiResponse> update(@PathVariable Long id,
                                                      @RequestBody CategoryRequest request) {
-        CategoryResponse response = categoryService.update(id, request);
-        return ResponseEntity.ok(response);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(categoryService.update(id, request))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse> delete(@PathVariable Long id) {
         categoryService.delete(id);
-        return ResponseEntity.noContent().build();
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(204)
+                .status(true)
+                .message("Successfully!")
+                .data(null)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping
-    public ResponseEntity<Page<CategoryResponse>> getAll(
+    public ResponseEntity<ApiResponse> getAll(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -59,12 +77,25 @@ public class CategoryController {
         Page<CategoryResponse> result =
                 categoryService.getAll(name, pageable);
 
-        return ResponseEntity.ok(result);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(result)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getById(@PathVariable Long id) {
-        CategoryResponse response = categoryService.getById(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse> getById(@PathVariable Long id) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(categoryService.getById(id))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 }
