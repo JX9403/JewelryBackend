@@ -32,7 +32,7 @@ public class User extends BaseEntity implements UserDetails {
     private String email;
 
     private String firstname;
-    private String secondname;
+    private String lastname;
 
     @NotBlank(message = "Password không được để trống")
     private String password;
