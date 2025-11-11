@@ -7,7 +7,7 @@ import com.ndn.JewelryBackend.dto.response.JwtAuthenticationResponse;
 import com.ndn.JewelryBackend.entity.User;
 
 public interface AuthService {
-     User registerUser(RegisterRequest request) ;
+     void registerUser(RegisterRequest request) ;
      JwtAuthenticationResponse login(LoginRequest loginRequest);
      JwtAuthenticationResponse refreshToken(RefreshTokenRequest request);
 }

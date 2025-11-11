@@ -2,9 +2,7 @@ package com.ndn.JewelryBackend.service.impl;
 
 import com.ndn.JewelryBackend.dto.request.CollectionRequest;
 import com.ndn.JewelryBackend.dto.response.CollectionResponse;
-import com.ndn.JewelryBackend.dto.response.UserVoucherResponse;
 import com.ndn.JewelryBackend.entity.Collection;
-import com.ndn.JewelryBackend.entity.UserVoucher;
 import com.ndn.JewelryBackend.repository.CollectionRepository;
 import com.ndn.JewelryBackend.service.CollectionService;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

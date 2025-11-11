@@ -32,7 +32,7 @@ public class User extends BaseEntity implements UserDetails {
     private String email;
 
     private String firstname;
-    private String secondname;
+    private String lastname;
 
     @NotBlank(message = "Password không được để trống")
     private String password;
@@ -40,10 +40,6 @@ public class User extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserVoucher> userVouchers = new ArrayList<>();
-
 
     // ---------------- Spring Security ----------------
     @Override

@@ -31,18 +31,18 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
 
 
-    public User registerUser(RegisterRequest request) {
+    public void registerUser(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalStateException("Email already taken");
         }
         User user = new User();
         user.setFirstname(request.getFirstname());
-        user.setSecondname(request.getSecondname());
+        user.setLastname(request.getSecondname());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.USER);
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     public JwtAuthenticationResponse login(LoginRequest loginRequest){

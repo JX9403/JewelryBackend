@@ -26,11 +26,7 @@ public class JwtServiceImpl implements JwtService {
     private Long expiration;
 
     public String generateToken(UserDetails userDetails){
-        return Jwts.builder().setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+expiration))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
+        return generateRefreshToken(new HashMap<>(), userDetails);
     }
     public String generateRefreshToken(Map<String, Objects> extraClaims, UserDetails userDetails){
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())

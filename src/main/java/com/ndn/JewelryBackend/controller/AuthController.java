@@ -1,9 +1,11 @@
 package com.ndn.JewelryBackend.controller;
 
 import com.ndn.JewelryBackend.dto.request.*;
+import com.ndn.JewelryBackend.dto.response.ApiResponse;
 import com.ndn.JewelryBackend.dto.response.JwtAuthenticationResponse;
 import com.ndn.JewelryBackend.entity.User;
 import com.ndn.JewelryBackend.exception.ResourceNotFoundException;
+import com.ndn.JewelryBackend.repository.UserRepository;
 import com.ndn.JewelryBackend.service.AuthService;
 import com.ndn.JewelryBackend.service.JwtService;
 import com.ndn.JewelryBackend.service.impl.JwtServiceImpl;
@@ -17,46 +19,75 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
     private final JwtService jwtService;
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthenticationResponse> login(@Valid @RequestBody LoginRequest loginRequest){
-        return ResponseEntity.ok(authService.login(loginRequest));
+    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest loginRequest){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Login successfully!")
+                .data(authService.login(loginRequest))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody RegisterRequest request){
-        User user = authService.registerUser(request);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegisterRequest request){
+        authService.registerUser(request);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Register successfully!")
+                .data(null)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<JwtAuthenticationResponse> refresh(@Valid @RequestBody RefreshTokenRequest request){
-        JwtAuthenticationResponse jwtAuthenticationResponse = authService.refreshToken(request);
-        return ResponseEntity.ok(jwtAuthenticationResponse);
+    public ResponseEntity<ApiResponse> refresh(@Valid @RequestBody RefreshTokenRequest request){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Register successfully!")
+                .data(authService.refreshToken(request))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
-//
-//    @PostMapping("/change-password")
-//    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request){
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if(authentication == null || !authentication.isAuthenticated()){
-//            return ResponseEntity.status(401).body("Unauthorized");
-//        }
-//        String email = authentication.getName();
-//        userService.changePassword(email, request);
-//        return ResponseEntity.ok("Password changed");
-//    }
 
+    @GetMapping("/login-success")
+    public JwtAuthenticationResponse loginSuccess(OAuth2AuthenticationToken authentication) {
+        DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
+
+        // Lấy email từ OAuth2User
+        String email = oauthUser.getAttribute("email");
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+
+        // Tạo token
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
+
+        return JwtAuthenticationResponse.builder()
+                .token(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }

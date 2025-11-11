@@ -1,6 +1,10 @@
 package com.ndn.JewelryBackend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ndn.JewelryBackend.dto.response.JwtAuthenticationResponse;
 import com.ndn.JewelryBackend.repository.UserRepository;
+import com.ndn.JewelryBackend.service.CustomOAuth2UserService;
+import com.ndn.JewelryBackend.service.CustomOidcUserService;
 import com.ndn.JewelryBackend.service.JwtService;
 import com.ndn.JewelryBackend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +22,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -29,6 +36,9 @@ public class SecurityConfig {
     private final UserService userService;
     private final JwtService jwtService;
     private final ApiPermissionConfig apiPermissionConfig;
+    private final AuthenticationProvider authenticationProvider;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOidcUserService customOidcUserService;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -49,22 +59,33 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider(passwordEncoder))
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService) // cho provider không dùng OIDC
+                                .oidcUserService(customOidcUserService) // thêm dòng này để Google cũng vào đây
+                        )
+                        .successHandler((request, response, authentication) -> {
+                            DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
+
+                            String refresh_token = (String) oauthUser.getAttributes().get("refresh_token");
+                            String access_token = (String) oauthUser.getAttributes().get("access_token");
+
+                            JwtAuthenticationResponse jwtResponse = JwtAuthenticationResponse.builder()
+                                    .token(access_token)
+                                    .refreshToken(refresh_token)
+                                    .build();
+
+                            response.setContentType("application/json");
+                            new ObjectMapper().writeValue(response.getOutputStream(), jwtResponse);
+                        })
+                )
+
+                .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService.userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
-    }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
+
 }

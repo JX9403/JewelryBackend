@@ -1,8 +1,8 @@
 package com.ndn.JewelryBackend.controller;
 
 import com.ndn.JewelryBackend.dto.request.ProductRequest;
+import com.ndn.JewelryBackend.dto.response.ApiResponse;
 import com.ndn.JewelryBackend.dto.response.ProductResponse;
-import com.ndn.JewelryBackend.dto.response.UserVoucherResponse;
 import com.ndn.JewelryBackend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.List;
+import java.util.Date;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,28 +26,45 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponse> create(@RequestBody ProductRequest request) {
-        ProductResponse response = productService.create(request);
-        return ResponseEntity
-                .created(URI.create("/api/products/" + response.getId()))
-                .body(response);
+    public ResponseEntity<ApiResponse> create(@RequestBody ProductRequest request) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(productService.create(request))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> update(@PathVariable Long id,
+    public ResponseEntity<ApiResponse> update(@PathVariable Long id,
                                                   @RequestBody ProductRequest request) {
-        ProductResponse response = productService.update(id, request);
-        return ResponseEntity.ok(response);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(productService.update(id, request))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse> delete(@PathVariable Long id) {
         productService.delete(id);
-        return ResponseEntity.noContent().build();
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(204)
+                .status(true)
+                .message("Successfully!")
+                .data(null)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getAll(
+    public ResponseEntity<ApiResponse> getAll(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long collectionId,
@@ -67,23 +84,44 @@ public class ProductController {
 
         Page<ProductResponse> responses =
                 productService.getAll(name, categoryId, collectionId, priceTo, priceFrom, gender, pageable);
-        return ResponseEntity.ok(responses);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(responses)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
-        ProductResponse response = productService.getById(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse> getById(@PathVariable Long id) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(productService.getById(id))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping(value = "/visual_search", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Page<ProductResponse>>  visualSearch(
+    public ResponseEntity<ApiResponse>  visualSearch(
             @RequestParam MultipartFile file,
             @RequestParam Long categoriesId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
             ) {
         Page<ProductResponse> responses = productService.visualSearch(categoriesId, file, PageRequest.of(page, size));
-        return ResponseEntity.ok(responses);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(responses)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 }
