@@ -6,5 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AIService {
     PGvector productAnalyze(MultipartFile file) throws InsufficientStockException;
+    String AnalyzeAllImg() throws InsufficientStockException;
 }
 
