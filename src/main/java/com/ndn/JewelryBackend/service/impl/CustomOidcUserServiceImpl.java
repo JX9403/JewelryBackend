@@ -1,8 +1,9 @@
-package com.ndn.JewelryBackend.service;
+package com.ndn.JewelryBackend.service.impl;
 
 import com.ndn.JewelryBackend.entity.User;
 import com.ndn.JewelryBackend.enums.Role;
 import com.ndn.JewelryBackend.repository.UserRepository;
+import com.ndn.JewelryBackend.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,14 +11,12 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class CustomOidcUserService extends OidcUserService {
+public class CustomOidcUserServiceImpl extends OidcUserService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;

@@ -11,9 +11,9 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     boolean existsByName(String name);
 
     @Query("""
-            SELECT c FROM Collection c
-            WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
-            """)
+       SELECT c FROM Collection c
+       WHERE (COALESCE(:name, '') = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+       """)
     Page<Collection> findAll(@Param("name") String name, Pageable pageable);
 
 }

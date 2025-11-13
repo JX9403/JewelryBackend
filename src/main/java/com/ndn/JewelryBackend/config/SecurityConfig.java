@@ -3,24 +3,19 @@ package com.ndn.JewelryBackend.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndn.JewelryBackend.dto.response.JwtAuthenticationResponse;
 import com.ndn.JewelryBackend.repository.UserRepository;
-import com.ndn.JewelryBackend.service.CustomOAuth2UserService;
-import com.ndn.JewelryBackend.service.CustomOidcUserService;
+import com.ndn.JewelryBackend.service.impl.CustomOAuth2UserServiceImpl;
+import com.ndn.JewelryBackend.service.impl.CustomOidcUserServiceImpl;
 import com.ndn.JewelryBackend.service.JwtService;
 import com.ndn.JewelryBackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,8 +32,8 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final ApiPermissionConfig apiPermissionConfig;
     private final AuthenticationProvider authenticationProvider;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomOidcUserService customOidcUserService;
+    private final CustomOAuth2UserServiceImpl customOAuth2UserServiceImpl;
+    private final CustomOidcUserServiceImpl customOidcUserServiceImpl;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -56,13 +51,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, apiPermissionConfig.getPermitAllPut()).permitAll()
                         .requestMatchers(HttpMethod.DELETE, apiPermissionConfig.getPermitAllDelete()).permitAll()
                         .requestMatchers("/api/auth/change-password").authenticated()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService) // cho provider không dùng OIDC
-                                .oidcUserService(customOidcUserService) // thêm dòng này để Google cũng vào đây
+                                .userService(customOAuth2UserServiceImpl) // cho provider không dùng OIDC
+                                .oidcUserService(customOidcUserServiceImpl) // thêm dòng này để Google cũng vào đây
                         )
                         .successHandler((request, response, authentication) -> {
                             DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();

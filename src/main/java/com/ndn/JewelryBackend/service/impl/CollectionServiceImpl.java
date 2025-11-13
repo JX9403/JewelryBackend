@@ -2,14 +2,19 @@ package com.ndn.JewelryBackend.service.impl;
 
 import com.ndn.JewelryBackend.dto.request.CollectionRequest;
 import com.ndn.JewelryBackend.dto.response.CollectionResponse;
+import com.ndn.JewelryBackend.dto.response.ProductResponse;
 import com.ndn.JewelryBackend.entity.Collection;
+import com.ndn.JewelryBackend.entity.Product;
 import com.ndn.JewelryBackend.repository.CollectionRepository;
 import com.ndn.JewelryBackend.service.CollectionService;
+import com.ndn.JewelryBackend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CollectionServiceImpl implements CollectionService {
 
     private final CollectionRepository collectionRepository;
+    private final ProductService productService;
 
     @Override
     public CollectionResponse create(CollectionRequest request) {
@@ -61,6 +67,11 @@ public class CollectionServiceImpl implements CollectionService {
         return toResponse(collection);
     }
 
+    @Override
+    public Page<ProductResponse> getProducts( Long collectionId, Pageable pageable) {
+        Page<ProductResponse> page = productService.getProductsByCollection(collectionId, pageable);
+        return page;
+    }
 
     private CollectionResponse toResponse(Collection collection) {
         return CollectionResponse.builder()

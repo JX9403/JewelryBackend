@@ -12,9 +12,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByCollectionId(Long collectionId);
+    @Query("SELECT p FROM Product p WHERE p.category.id = :categoryId")
+    Page<Product> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 
-    List<Product> findByCategoryId(Long categoryId);
+    @Query("SELECT p FROM Product p WHERE p.collection.id = :collectionId")
+    Page<Product> findByCollectionId(@Param("collectionId") Long collectionId, Pageable pageable);
 
     @Query("""
             SELECT p FROM Product p

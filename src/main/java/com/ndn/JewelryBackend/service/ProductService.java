@@ -18,13 +18,13 @@ public interface ProductService {
 
     void delete(Long id);
 
-    Page<ProductResponse> getAll(String name, Long categoryId, Long collectionId, BigDecimal priceTo, BigDecimal priceFrom, String gender, Pageable pageable);
+    Page<ProductResponse> getAll(String name, Long categoryId, Long collectionId, String gender, Pageable pageable);
 
     ProductResponse getById(Long id);
 
-    List<ProductResponse> getProductsByCollection(Long collectionId);
+    Page<ProductResponse> getProductsByCollection( Long collectionId, Pageable pageable);
+    Page<ProductResponse> getProductsByCategory( Long categoryId, Pageable pageable);
 
-    List<ProductResponse> getProductsByCategory(Long categoryId);
 
     Page<ProductResponse> visualSearch(Long categoryID , MultipartFile file, Pageable pageable) throws InsufficientStockException;
 }

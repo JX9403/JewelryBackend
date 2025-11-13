@@ -3,6 +3,8 @@ package com.ndn.JewelryBackend.controller;
 import com.ndn.JewelryBackend.dto.request.CollectionRequest;
 import com.ndn.JewelryBackend.dto.response.ApiResponse;
 import com.ndn.JewelryBackend.dto.response.CollectionResponse;
+import com.ndn.JewelryBackend.dto.response.ProductResponse;
+import com.ndn.JewelryBackend.entity.Product;
 import com.ndn.JewelryBackend.service.CollectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,7 +68,6 @@ public class CollectionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort
-
     ) {
         String[] parts = sort.split(",");
         String sortField = parts[0];
@@ -94,6 +95,30 @@ public class CollectionController {
                 .status(true)
                 .message("Successfully!")
                 .data(collectionService.getById(id))
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/{collectionId}/products")
+    public ResponseEntity<ApiResponse> getProducts(@PathVariable Long categoryId,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size,
+                                                   @RequestParam(defaultValue = "createdAt,desc") String sort) {
+        String[] parts = sort.split(",");
+        String sortField = parts[0];
+        String sortDir = (parts.length > 1) ? parts[1] : "desc";
+
+        Sort.Direction direction = Sort.Direction.fromString(sortDir);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        Page<ProductResponse> result =
+                collectionService.getProducts(categoryId, pageable);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(result)
                 .timestamp(new Date())
                 .build();
         return ResponseEntity.ok(apiResponse);

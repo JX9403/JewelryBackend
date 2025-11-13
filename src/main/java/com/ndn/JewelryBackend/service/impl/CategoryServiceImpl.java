@@ -4,11 +4,13 @@ import com.ndn.JewelryBackend.dto.request.CategoryRequest;
 import com.ndn.JewelryBackend.dto.response.CategoryResponse;
 import com.ndn.JewelryBackend.dto.response.CategoryResponse;
 import com.ndn.JewelryBackend.dto.response.CategoryResponse;
+import com.ndn.JewelryBackend.dto.response.ProductResponse;
 import com.ndn.JewelryBackend.entity.Category;
 import com.ndn.JewelryBackend.entity.Category;
 import com.ndn.JewelryBackend.entity.Category;
 import com.ndn.JewelryBackend.repository.CategoryRepository;
 import com.ndn.JewelryBackend.service.CategoryService;
+import com.ndn.JewelryBackend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductService productService;
 
     @Override
     public CategoryResponse create(CategoryRequest request) {
@@ -66,7 +69,11 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
         return mapToResponse(category);
     }
-
+    @Override
+    public Page<ProductResponse> getProducts(Long categoryId, Pageable pageable) {
+        Page<ProductResponse> page = productService.getProductsByCategory(categoryId, pageable);
+        return page;
+    }
     private CategoryResponse mapToResponse(Category category) {
         return CategoryResponse.builder()
                 .id(category.getId())

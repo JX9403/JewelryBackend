@@ -1,8 +1,9 @@
-package com.ndn.JewelryBackend.service;
+package com.ndn.JewelryBackend.service.impl;
 
 import com.ndn.JewelryBackend.entity.User;
 import com.ndn.JewelryBackend.enums.Role;
 import com.ndn.JewelryBackend.repository.UserRepository;
+import com.ndn.JewelryBackend.service.JwtService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,9 +26,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class CustomOAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
+    private static final Logger log = LoggerFactory.getLogger(com.ndn.JewelryBackend.service.impl.CustomOAuth2UserServiceImpl.class);
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;

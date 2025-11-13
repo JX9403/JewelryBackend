@@ -68,8 +68,6 @@ public class ProductController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long collectionId,
-            @RequestParam(required = false) BigDecimal priceFrom,
-            @RequestParam(required = false) BigDecimal priceTo,
             @RequestParam(required = false) String gender,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -83,7 +81,7 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
 
         Page<ProductResponse> responses =
-                productService.getAll(name, categoryId, collectionId, priceTo, priceFrom, gender, pageable);
+                productService.getAll(name, categoryId, collectionId, gender, pageable);
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(200)

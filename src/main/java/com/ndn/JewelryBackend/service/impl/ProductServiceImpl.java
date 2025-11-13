@@ -126,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAll(String name, Long categoryId, Long collectionId, BigDecimal priceTo, BigDecimal priceFrom, String gender, Pageable pageable) {
+    public Page<ProductResponse> getAll(String name, Long categoryId, Long collectionId, String gender, Pageable pageable) {
         Page<Product> page = productRepository.findAll(pageable);
         return page.map(this::toResponse);
     }
@@ -142,7 +142,7 @@ public class ProductServiceImpl implements ProductService {
         return toResponse(product);
     }
 
-    private ProductResponse toResponse(Product product) {
+    ProductResponse toResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -165,19 +165,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getProductsByCollection(Long collectionId) {
-        return productRepository.findByCollectionId(collectionId)
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+    public Page<ProductResponse> getProductsByCollection( Long collectionId, Pageable pageable) {
+        Page<Product> page = productRepository.findByCollectionId(collectionId, pageable);
+        return page.map(this::toResponse);
 
+    }
     @Override
-    public List<ProductResponse> getProductsByCategory(Long categoryId) {
-        return productRepository.findByCategoryId(categoryId)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<ProductResponse> getProductsByCategory( Long categoryId, Pageable pageable) {
+        Page<Product> page = productRepository.findByCategoryId(categoryId, pageable);
+        return page.map(this::toResponse);
     }
 
     @Override

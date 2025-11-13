@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
                 .message(jsonErrors)
                 .timestamp(new Date())
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request){
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .timestamp(new Date())
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<?> handleInsufficientStockException(InsufficientStockException ex, WebRequest request){
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .timestamp(new Date())
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request){
@@ -65,6 +65,6 @@ public class GlobalExceptionHandler {
                 .message(ex.getMessage())
                 .timestamp(new Date())
                 .build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }

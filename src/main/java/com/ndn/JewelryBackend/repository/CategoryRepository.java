@@ -12,8 +12,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     boolean existsByName(String name);
 
     @Query("""
-            SELECT c FROM Category c
-            WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
-            """)
+       SELECT c FROM Category c
+       WHERE (COALESCE(:name, '') = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+       """)
     Page<Category> findAll(@Param("name") String name, Pageable pageable);
 }

@@ -23,7 +23,8 @@ public class ApiPermissionConfig {
     public String[] getPermitAllGet() {
         return new String[]{
                 "/api/products/**",
-                "/api/vouchers/**"
+                "/api/categories/**",
+                "/api/collections/**"
         };
     }
 
