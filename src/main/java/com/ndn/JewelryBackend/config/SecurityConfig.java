@@ -2,6 +2,7 @@ package com.ndn.JewelryBackend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndn.JewelryBackend.dto.response.JwtAuthenticationResponse;
+import com.ndn.JewelryBackend.repository.TokenRepository;
 import com.ndn.JewelryBackend.repository.UserRepository;
 import com.ndn.JewelryBackend.service.impl.CustomOAuth2UserServiceImpl;
 import com.ndn.JewelryBackend.service.impl.CustomOidcUserServiceImpl;
@@ -16,10 +17,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -34,10 +38,12 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final CustomOAuth2UserServiceImpl customOAuth2UserServiceImpl;
     private final CustomOidcUserServiceImpl customOidcUserServiceImpl;
+    private final TokenRepository tokenRepository;
+    private final LogoutHandler logoutHandler;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtService, userService);
+        return new JwtAuthenticationFilter(jwtService, userService, tokenRepository);
     }
 
     @Bean
@@ -66,7 +72,7 @@ public class SecurityConfig {
                             String access_token = (String) oauthUser.getAttributes().get("access_token");
 
                             JwtAuthenticationResponse jwtResponse = JwtAuthenticationResponse.builder()
-                                    .token(access_token)
+                                    .accessToken(access_token)
                                     .refreshToken(refresh_token)
                                     .build();
 
@@ -76,8 +82,15 @@ public class SecurityConfig {
                 )
 
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(logoutHandler)
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            SecurityContextHolder.clearContext();
+                        })
+                )
+        ;
         return http.build();
     }
 

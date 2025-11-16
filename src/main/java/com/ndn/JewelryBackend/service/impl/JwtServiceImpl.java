@@ -23,19 +23,29 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.expiration}")
-    private Long expiration;
+    private Long jwtExpiration;
+
+    @Value("${jwt.refresh-token.expiration}")
+    private Long refreshExpiration;
 
     public String generateToken(UserDetails userDetails){
         return generateRefreshToken(new HashMap<>(), userDetails);
     }
+    public String generateToken(Map<String, Objects> extraClaims, UserDetails userDetails){
+       return buildToken(extraClaims, userDetails, jwtExpiration);
+    }
     public String generateRefreshToken(Map<String, Objects> extraClaims, UserDetails userDetails){
+        return buildToken(extraClaims, userDetails, refreshExpiration);
+    }
+
+
+    private String buildToken(Map<String, Objects> extraClaims, UserDetails userDetails, long expiration){
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+expiration))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
-
 
     private Key getSiginKey(){
         byte[] key = Decoders.BASE64.decode(secret);
