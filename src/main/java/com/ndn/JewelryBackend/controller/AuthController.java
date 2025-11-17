@@ -64,4 +64,29 @@ public class AuthController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse> getMe(){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(authService.getMe())
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse> changePassword(@RequestBody ChangePasswordRequest request) {
+        authService.changePassword(request);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(null)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+
 }
