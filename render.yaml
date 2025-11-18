@@ -3,10 +3,12 @@ services:
     name: jewelry-backend
     env: docker
     plan: free
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./dockerfile
     autoDeploy: true
 
     envVars:
+
+      # --- DATABASE ---
       - key: SPRING_DATASOURCE_URL
         value: jdbc:postgresql://aws-1-us-east-1.pooler.supabase.com:6543/postgres?prepareThreshold=0
 
@@ -14,16 +16,36 @@ services:
         value: postgres.ouctqivmplxdzrgpjggl
 
       - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
+        sync: false   # nhập thủ công
 
+      # --- JWT ---
       - key: JWT_SECRET
-        sync: false
+        sync: false   # nhập thủ công
 
+      # --- SUPABASE ---
       - key: SUPABASE_URL
         value: https://ouctqivmplxdzrgpjggl.supabase.co
 
       - key: SUPABASE_KEY
-        sync: false
+        sync: false   # nhập thủ công (service_role key)
 
+      - key: SUPABASE_BUCKET
+        value: images
+
+      # --- AI Service ---
       - key: URL_DEV_AI
         value: https://phamxuannghi777-jewelrypython.hf.space
+
+      - key: PYTHON_AI_URL
+        value: https://phamxuannghi777-jewelrypython.hf.space
+
+      # --- GOOGLE OAUTH2 ---
+      - key: GOOGLE_CLIENT_ID
+        value: 685934967957-p2ndhp2stdnspctvs0fn7o5kaq70i1ba.apps.googleusercontent.com
+
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false    # nhập thủ công
+
+      # --- PORT (Render tự inject nhưng ta khai báo cho chắc) ---
+      - key: PORT
+        value: 8080
