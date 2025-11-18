@@ -37,11 +37,11 @@ services:
         value: https://phamxuannghi777-jewelrypython.hf.space
 
       - key: PYTHON_AI_URL
-        value: https://phamxuannghi777-jewelrypython.hf.space
+        value: https://wren-nonrecollective-billye.ngrok-free.dev
 
       # --- GOOGLE OAUTH2 ---
       - key: GOOGLE_CLIENT_ID
-        value: 685934967957-p2ndhp2stdnspctvs0fn7o5kaq70i1ba.apps.googleusercontent.com
+          value: 685934967957-p2ndhp2stdnspctvs0fn7o5kaq70i1ba.apps.googleusercontent.com
 
       - key: GOOGLE_CLIENT_SECRET
         sync: false    # nhập thủ công
