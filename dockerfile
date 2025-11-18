@@ -1,26 +1,9 @@
-# Stage 1: Build ứng dụng
-FROM maven:3.9.5-eclipse-temurin-17 AS build
-
-WORKDIR /app
-
+FROM maven:3.8.5-openjdk-17 AS build
 COPY pom.xml .
-RUN mvn -q -B dependency:go-offline
-
 COPY src ./src
-RUN mvn -q -B package -DskipTests
+RUN mvn clean package -DskipTests
 
-# Stage 2: Run app
-FROM eclipse-temurin:17-jdk
-
-WORKDIR /app
-
-COPY --from=build /app/target/*.jar app.jar
-
-# Render sẽ truyền biến PORT, ta phải dùng nó
-ENV PORT=8080
-
-# Lắng nghe port do Render đặt
+FROM openjdk:17.0.1-jdk-slim
+COPY --from=build /target/fake_Slink-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-
-# Spring Boot bắt buộc chạy bằng cổng PORT do Render cấp
-CMD ["sh", "-c", "java -jar app.jar --server.port=$PORT"]
+ENTRYPOINT ["java","-jar","app.jar"]
