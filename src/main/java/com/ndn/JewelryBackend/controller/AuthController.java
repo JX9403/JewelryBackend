@@ -11,6 +11,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -25,6 +28,8 @@ public class AuthController {
     private final AuthService authService;
     private final UserRepository userRepository;
 
+    private final LogoutHandler logoutHandler;
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest loginRequest){
         ApiResponse apiResponse = ApiResponse.builder()
@@ -35,6 +40,17 @@ public class AuthController {
                 .timestamp(new Date())
                 .build();
         return ResponseEntity.ok(apiResponse);
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        logoutHandler.logout(request, response, authentication);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok(ApiResponse.builder() .code(200)
+                .status(true)
+                .message("Logged out successfully!")
+                .data(null)
+                .timestamp(new Date())
+                .build());
     }
 
     @PostMapping("/register")
