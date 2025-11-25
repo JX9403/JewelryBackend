@@ -101,7 +101,7 @@ public class CollectionController {
     }
 
     @GetMapping("/{collectionId}/products")
-    public ResponseEntity<ApiResponse> getProducts(@PathVariable Long categoryId,
+    public ResponseEntity<ApiResponse> getProducts(@PathVariable Long collectionId,
                                                    @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "10") int size,
                                                    @RequestParam(defaultValue = "createdAt,desc") String sort) {
@@ -113,7 +113,7 @@ public class CollectionController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
 
         Page<ProductResponse> result =
-                collectionService.getProducts(categoryId, pageable);
+                collectionService.getProducts(collectionId, pageable);
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(200)
                 .status(true)
