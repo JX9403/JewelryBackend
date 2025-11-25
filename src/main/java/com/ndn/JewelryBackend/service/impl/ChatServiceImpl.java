@@ -10,8 +10,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
@@ -23,8 +21,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ChatResponse ask(ChatRequest chatRequest) {
         String url = pythonAiUrl + "chat";
-        chatRequest.setSession_id(UUID.randomUUID().toString());
-
+        chatRequest.setSession_id(chatRequest.getSession_id());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<ChatRequest> requestEntity = new HttpEntity<>(chatRequest, headers);

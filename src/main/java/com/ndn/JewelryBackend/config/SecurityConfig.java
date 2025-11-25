@@ -80,16 +80,8 @@ public class SecurityConfig {
                             new ObjectMapper().writeValue(response.getOutputStream(), jwtResponse);
                         })
                 )
-
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .addLogoutHandler(logoutHandler)
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            SecurityContextHolder.clearContext();
-                        })
-                )
         ;
         return http.build();
     }

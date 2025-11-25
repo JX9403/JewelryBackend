@@ -141,8 +141,8 @@ public class ProductServiceImpl implements ProductService {
 
         return toResponse(product);
     }
-
-    ProductResponse toResponse(Product product) {
+    @Override
+    public ProductResponse toResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
