@@ -30,19 +30,20 @@ public class ApiPermissionConfig {
 
     public String[] getPermitAllPost() {
         return new String[]{
-                // thêm endpoint POST cho phép public ở đây
+               "/api/auth/register",
+                "/api/auth/login",
+                "/api/chat/**"
         };
     }
 
     public String[] getPermitAllPut() {
         return new String[]{
-                // thêm endpoint PUT public ở đây
+
         };
     }
 
     public String[] getPermitAllDelete() {
         return new String[]{
-                // thêm endpoint DELETE public ở đây
         };
     }
 }
