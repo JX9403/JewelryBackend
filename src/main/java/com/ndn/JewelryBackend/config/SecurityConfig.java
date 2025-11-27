@@ -56,8 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, apiPermissionConfig.getPermitAllPost()).permitAll()
                         .requestMatchers(HttpMethod.PUT, apiPermissionConfig.getPermitAllPut()).permitAll()
                         .requestMatchers(HttpMethod.DELETE, apiPermissionConfig.getPermitAllDelete()).permitAll()
-                        .requestMatchers("/api/auth/change-password").authenticated()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2

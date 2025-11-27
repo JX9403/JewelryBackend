@@ -31,13 +31,10 @@ public class JwtServiceImpl implements JwtService {
     public String generateToken(UserDetails userDetails){
         return generateRefreshToken(new HashMap<>(), userDetails);
     }
-    public String generateToken(Map<String, Objects> extraClaims, UserDetails userDetails){
-       return buildToken(extraClaims, userDetails, jwtExpiration);
-    }
+
     public String generateRefreshToken(Map<String, Objects> extraClaims, UserDetails userDetails){
         return buildToken(extraClaims, userDetails, refreshExpiration);
     }
-
 
     private String buildToken(Map<String, Objects> extraClaims, UserDetails userDetails, long expiration){
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
