@@ -1,5 +1,6 @@
 package com.ndn.JewelryBackend.service;
 
+import com.ndn.JewelryBackend.dto.request.UpdateUserRequest;
 import com.ndn.JewelryBackend.dto.response.UserResponse;
 import com.ndn.JewelryBackend.entity.User;
 import jakarta.transaction.Transactional;
@@ -14,5 +15,6 @@ public interface UserService {
 
      Page<UserResponse> getAllUsers(String email, Pageable pageable);
 
-     void update(Long userId, User user);
+     void update(Long userId, UpdateUserRequest request);
+
 }
