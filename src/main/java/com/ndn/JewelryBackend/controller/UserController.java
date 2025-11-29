@@ -1,5 +1,6 @@
 package com.ndn.JewelryBackend.controller;
 
+import com.ndn.JewelryBackend.dto.request.UpdateUserRequest;
 import com.ndn.JewelryBackend.dto.response.ApiResponse;
 import com.ndn.JewelryBackend.dto.response.CategoryResponse;
 import com.ndn.JewelryBackend.dto.response.UserResponse;
@@ -11,10 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -53,4 +52,17 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse> update(@PathVariable Long id,
+                                              @RequestBody UpdateUserRequest request) {
+        userService.update(id, request);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(null)
+                .timestamp(new Date())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
 }

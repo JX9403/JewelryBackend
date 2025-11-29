@@ -6,23 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
-    @NotBlank
-    @Email
-    private String email;
-
-    @NotBlank
-    private String password;
-
+public class UpdateUserRequest {
     @NotBlank
     private String firstname;
-
     @NotBlank
     private String lastname;
 }
