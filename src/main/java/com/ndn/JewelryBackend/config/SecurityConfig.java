@@ -48,6 +48,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,PasswordEncoder passwordEncoder) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(apiPermissionConfig.getPermitAllPatterns()).permitAll()
                         .requestMatchers(HttpMethod.GET, apiPermissionConfig.getPermitAllGet()).permitAll()
