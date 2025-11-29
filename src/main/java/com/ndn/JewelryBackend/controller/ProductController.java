@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,7 +25,7 @@ import java.util.Date;
 public class ProductController {
 
     private final ProductService productService;
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse> create(@RequestBody ProductRequest request) {
         ApiResponse apiResponse = ApiResponse.builder()
@@ -37,6 +38,7 @@ public class ProductController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> update(@PathVariable Long id,
                                                   @RequestBody ProductRequest request) {
@@ -49,7 +51,7 @@ public class ProductController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> delete(@PathVariable Long id) {
         productService.delete(id);

@@ -1,9 +1,7 @@
 package com.ndn.JewelryBackend.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndn.JewelryBackend.dto.request.ChangePasswordRequest;
 import com.ndn.JewelryBackend.dto.request.LoginRequest;
-import com.ndn.JewelryBackend.dto.request.RefreshTokenRequest;
 import com.ndn.JewelryBackend.dto.request.RegisterRequest;
 import com.ndn.JewelryBackend.dto.response.JwtAuthenticationResponse;
 import com.ndn.JewelryBackend.dto.response.UserResponse;
@@ -14,26 +12,21 @@ import com.ndn.JewelryBackend.exception.ResourceNotFoundException;
 import com.ndn.JewelryBackend.repository.UserRepository;
 import com.ndn.JewelryBackend.service.AuthService;
 import com.ndn.JewelryBackend.service.JwtService;
-import com.ndn.JewelryBackend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import com.ndn.JewelryBackend.repository.TokenRepository;
 import com.ndn.JewelryBackend.entity.Token;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +52,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public JwtAuthenticationResponse login(LoginRequest loginRequest){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            // Tự ném exception để GlobalExceptionHandler xử lý
+            throw new BadCredentialsException("Invalid email or password");
+        }
         var user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(()-> new IllegalArgumentException("Valid email or password"));
         var jwt = jwtService.generateToken(user);
         var refreshToken = jwtService.generateToken(user);
@@ -80,38 +83,50 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public JwtAuthenticationResponse refreshToken(HttpServletRequest request) {
         final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        String username = null;
-        String refreshToken = null;
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new BadCredentialsException("Refresh token is missing");
+        }
 
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            refreshToken = authorizationHeader.substring(7);
+        String refreshToken = authorizationHeader.substring(7);
+        String username;
+
+        try {
             username = jwtService.extractUsername(refreshToken);
+        } catch (Exception e) {
+            throw new BadCredentialsException("Invalid refresh token");
         }
-        if(username != null){
-            var   user = userRepository.findByEmail(username).orElseThrow();
-            if(jwtService.isTokenValid(refreshToken, user)){
-               var accessToken = jwtService.generateToken(user);
-                revokeAllUserTokens(user);
-                var token = Token.builder()
-                        .user(user)
-                        .token(accessToken)
-                        .tokenType(TokenType.BEARER)
-                        .revoked(false)
-                        .expired(false)
-                        .build();
 
-                tokenRepository.save(token);
-               var jwtResponse = JwtAuthenticationResponse.builder()
-                       .accessToken(accessToken)
-                       .refreshToken(refreshToken)
-                       .build();
-               new ObjectMapper().writeValue(response.getOutputStream(), jwtResponse);
-            }
+        var user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (!jwtService.isTokenValid(refreshToken, user)) {
+            throw new BadCredentialsException("Refresh token is expired or invalid");
         }
+
+        // Tạo access token mới
+        var accessToken = jwtService.generateToken(user);
+
+        // Revoke các token cũ
+        revokeAllUserTokens(user);
+        var token = Token.builder()
+                .user(user)
+                .tokenType(TokenType.BEARER)
+                .token(accessToken)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepository.save(token);
+
+        // Trả về object, controller sẽ wrap thành ApiResponse
+        return JwtAuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
+
 
     @Override
     public UserResponse getMe() {

@@ -17,21 +17,18 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
+
 public class SecurityConfig {
 
-    private final UserRepository userRepository;
     private final UserService userService;
     private final JwtService jwtService;
     private final ApiPermissionConfig apiPermissionConfig;
@@ -39,7 +36,8 @@ public class SecurityConfig {
     private final CustomOAuth2UserServiceImpl customOAuth2UserServiceImpl;
     private final CustomOidcUserServiceImpl customOidcUserServiceImpl;
     private final TokenRepository tokenRepository;
-    private final LogoutHandler logoutHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -56,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, apiPermissionConfig.getPermitAllPost()).permitAll()
                         .requestMatchers(HttpMethod.PUT, apiPermissionConfig.getPermitAllPut()).permitAll()
                         .requestMatchers(HttpMethod.DELETE, apiPermissionConfig.getPermitAllDelete()).permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
@@ -81,6 +79,9 @@ public class SecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                );
         ;
         return http.build();
     }

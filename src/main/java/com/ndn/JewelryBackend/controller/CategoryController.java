@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -25,6 +26,7 @@ public class CategoryController {
     private final ProductService productService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> create(@RequestBody CategoryRequest request) {
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(200)
@@ -35,7 +37,7 @@ public class CategoryController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> update(@PathVariable Long id,
                                                      @RequestBody CategoryRequest request) {
@@ -48,7 +50,7 @@ public class CategoryController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> delete(@PathVariable Long id) {
         categoryService.delete(id);

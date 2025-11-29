@@ -2,6 +2,7 @@ package com.ndn.JewelryBackend.controller;
 
 import com.ndn.JewelryBackend.dto.request.*;
 import com.ndn.JewelryBackend.dto.response.ApiResponse;
+import com.ndn.JewelryBackend.dto.response.JwtAuthenticationResponse;
 import com.ndn.JewelryBackend.repository.UserRepository;
 import com.ndn.JewelryBackend.service.AuthService;
 import com.ndn.JewelryBackend.service.JwtService;
@@ -67,14 +68,15 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse> refresh(HttpServletRequest request, HttpServletResponse response) throws
+    public ResponseEntity<ApiResponse> refresh(HttpServletRequest request) throws
             IOException {
-        authService.refreshToken(request,response);
+        JwtAuthenticationResponse jwtResponse = authService.refreshToken(request);
+
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(200)
                 .status(true)
-                .message("Register successfully!")
-                .data(null)
+                .message("Token refreshed successfully")
+                .data(jwtResponse)
                 .timestamp(new Date())
                 .build();
         return ResponseEntity.ok(apiResponse);

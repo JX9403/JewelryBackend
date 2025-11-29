@@ -17,6 +17,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
 
     @Query("SELECT l.product FROM Like l WHERE l.user.id = :userId")
     Page<Product> findLikedProducts(@Param("userId") Long userId, Pageable pageable);
+    void deleteByProductId(Long id);
 
 }
 
