@@ -33,7 +33,8 @@ public class ApiPermissionConfig {
         return new String[]{
                "/api/auth/register",
                 "/api/auth/login",
-                "/api/chat/**"
+                "/api/chat/**",
+                "/api/products/visual_search"
         };
     }
 
