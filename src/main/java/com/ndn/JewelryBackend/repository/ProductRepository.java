@@ -18,12 +18,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByCollectionId(@Param("collectionId") Long collectionId, Pageable pageable);
 
     @Query("""
-            SELECT p FROM Product p
-            WHERE (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
-              AND (:categoryId IS NULL OR p.category.id = :categoryId)
-              AND (:collectionId IS NULL OR p.collection.id = :collectionId)
-              AND (:gender IS NULL OR p.gender = :gender)
-            """)
+    SELECT p FROM Product p
+    WHERE ((:name IS NULL OR :name = '') OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
+      AND (:categoryId IS NULL OR p.category.id = :categoryId)
+      AND (:collectionId IS NULL OR p.collection.id = :collectionId)
+      AND (:gender IS NULL OR p.gender = :gender)
+""")
     Page<Product> findAll(
             @Param("name") String name,
             @Param("categoryId") Long categoryId,
@@ -31,6 +31,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("gender") String gender,
             Pageable pageable
     );
+
+
+
+
+
+
 
     @Query(
             value = """

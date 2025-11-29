@@ -20,6 +20,7 @@ public class ApiPermissionConfig {
         };
     }
 
+
     public String[] getPermitAllGet() {
         return new String[]{
                 "/api/products/**",

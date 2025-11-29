@@ -8,6 +8,7 @@ import com.ndn.JewelryBackend.entity.*;
 import com.ndn.JewelryBackend.exception.InsufficientStockException;
 import com.ndn.JewelryBackend.repository.CategoryRepository;
 import com.ndn.JewelryBackend.repository.CollectionRepository;
+import com.ndn.JewelryBackend.repository.LikeRepository;
 import com.ndn.JewelryBackend.repository.ProductRepository;
 import com.ndn.JewelryBackend.service.AIService;
 import com.ndn.JewelryBackend.service.ProductService;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -26,12 +28,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CollectionRepository collectionRepository;
     private final CategoryRepository categoryRepository;
     private final AIService aiService;
+    private final LikeRepository likeRepository;
 
     @Override
     public ProductResponse create(ProductRequest request) {
@@ -77,6 +81,7 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
+        product.setId(id);
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
@@ -122,12 +127,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Long id) {
+        likeRepository.deleteByProductId(id);
+
         productRepository.deleteById(id);
     }
 
     @Override
     public Page<ProductResponse> getAll(String name, Long categoryId, Long collectionId, String gender, Pageable pageable) {
-        Page<Product> page = productRepository.findAll(pageable);
+        if (name == null || name.isBlank()) {
+            name = null;
+        }
+
+        Page<Product> page = productRepository.findAll(name, categoryId, collectionId, gender, pageable);
         return page.map(this::toResponse);
     }
 

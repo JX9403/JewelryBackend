@@ -3,8 +3,11 @@ package com.ndn.JewelryBackend.exception;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndn.JewelryBackend.dto.response.ApiResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,6 +35,31 @@ public class GlobalExceptionHandler {
                 .message(jsonErrors)
                 .timestamp(new Date())
                 .build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex) throws
+            JsonProcessingException {
+        ApiResponse apiResponse =  ApiResponse.builder()
+                .status(false)
+                .code(401)
+                .data(null)
+                .message(ex.getMessage())
+                .timestamp(new Date())
+                .build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiResponse> handleAuthorizationDenied(AuthorizationDeniedException ex) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .status(false)
+                .code(403)
+                .message("Access Denied")
+                .data(null)
+                .timestamp(new Date())
+                .build();
+
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
     @ExceptionHandler(ResourceNotFoundException.class)

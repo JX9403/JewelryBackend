@@ -2,6 +2,7 @@ package com.ndn.JewelryBackend.service;
 
 import com.ndn.JewelryBackend.dto.request.ProductRequest;
 import com.ndn.JewelryBackend.dto.response.ProductResponse;
+import com.ndn.JewelryBackend.entity.Collection;
 import com.ndn.JewelryBackend.entity.Product;
 import com.ndn.JewelryBackend.exception.InsufficientStockException;
 import org.springframework.data.domain.Page;

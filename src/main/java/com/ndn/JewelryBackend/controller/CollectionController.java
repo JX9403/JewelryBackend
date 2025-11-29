@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -23,7 +24,7 @@ import java.util.Date;
 public class CollectionController {
 
     private final CollectionService collectionService;
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse> create(@RequestBody CollectionRequest request) {
         ApiResponse apiResponse = ApiResponse.builder()
@@ -35,7 +36,7 @@ public class CollectionController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> update(@PathVariable Long id,
                                                      @RequestBody CollectionRequest request) {
@@ -48,7 +49,7 @@ public class CollectionController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> delete(@PathVariable Long id) {
         collectionService.delete(id);
