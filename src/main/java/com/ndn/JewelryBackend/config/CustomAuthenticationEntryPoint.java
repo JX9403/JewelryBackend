@@ -25,7 +25,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json;charset=UTF-8");
         ApiResponse body = ApiResponse.builder()
                 .status(false)
-                .code(403)
+                .code(401)
                 .message("Invalid token")
                 .data(null)
                 .timestamp(new Date())
