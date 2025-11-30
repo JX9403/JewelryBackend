@@ -37,4 +37,21 @@ public class ImageController {
     public ResponseEntity<String> EmbeddingAllProductImg() {
         return ResponseEntity.ok(imageService.embeddingAllProductImg());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteImage(@PathVariable Long id) {
+
+        imageService.deleteImage(id);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .status(true)
+                .message("Successfully!")
+                .data(null)
+                .timestamp(new Date())
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
 }
