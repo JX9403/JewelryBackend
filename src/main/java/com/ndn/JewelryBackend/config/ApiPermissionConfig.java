@@ -34,7 +34,8 @@ public class ApiPermissionConfig {
                "/api/auth/register",
                 "/api/auth/login",
                 "/api/chat/**",
-                "/api/products/visual_search"
+                "/api/products/visual_search",
+                "/api/images/**"
         };
     }
 
@@ -46,6 +47,7 @@ public class ApiPermissionConfig {
 
     public String[] getPermitAllDelete() {
         return new String[]{
+                "/api/images/**"
         };
     }
 }

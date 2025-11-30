@@ -9,4 +9,7 @@ public interface ImageService {
     ImageResponse uploadImage(MultipartFile file, Boolean isUsedForAI);
 
     String embeddingAllProductImg();
+
+    void deleteImage(Long id);
+
 }

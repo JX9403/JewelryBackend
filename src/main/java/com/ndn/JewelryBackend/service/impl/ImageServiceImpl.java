@@ -72,6 +72,28 @@ public class ImageServiceImpl implements ImageService {
     public String embeddingAllProductImg() {
         return aiService.AnalyzeAllImg();
     }
+    @Override
+    public void deleteImage(Long id) {
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        // Lấy đường dẫn file từ URL public
+        String filePath = image.getUrl()
+                .replace(supabaseUrl + "/storage/v1/object/public/" + bucket + "/", "");
+
+        // Gọi API xóa file trên Supabase
+        HttpResponse<String> res = Unirest
+                .delete(supabaseUrl + "/storage/v1/object/" + bucket + "/" + filePath)
+                .header("Authorization", "Bearer " + supabaseKey)
+                .asString();
+
+        if (res.getStatus() == 200) {
+            // Xoá trong database
+            imageRepository.delete(image);
+        } else {
+            throw new RuntimeException("Failed to delete image: " + res.getBody());
+        }
+    }
 
 
 }
