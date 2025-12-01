@@ -14,7 +14,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query("""
         SELECT c FROM Collection c
         WHERE (:name IS NULL OR :name = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
-        ORDER BY c.createdAt DESC
     """)
     Page<Collection> findAll(@Param("name") String name, Pageable pageable);
 
